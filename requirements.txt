@@ -3,3 +3,4 @@ backoff
 mock
 freezegun
 keboola.component==1.4.4
+ftputil==5.1.0

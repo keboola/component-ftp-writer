@@ -1,6 +1,6 @@
 {
   "type": "object",
-  "title": "SFTP writer",
+  "title": "SFTP / FTP writer",
   "required": [
     "hostname",
     "port",
@@ -8,20 +8,31 @@
     "#pass"
   ],
   "properties": {
+    "protocol": {
+      "enum": [
+        "SFTP",
+        "FTP",
+        "FTPS"
+      ],
+      "type": "string",
+      "title": "Protocol",
+      "propertyOrder": 10,
+      "default": "SFTP"
+    },
     "port": {
       "type": "integer",
       "default": 22,
-      "title": "SFTP host port",
+      "title": "Host port",
       "propertyOrder": 20
     },
     "user": {
       "type": "string",
-      "title": "SFTP user name",
+      "title": "User name",
       "propertyOrder": 30
     },
     "#pass": {
       "type": "string",
-      "title": "SFTP password",
+      "title": "Password",
       "format": "password",
       "propertyOrder": 40
     },
@@ -34,21 +45,31 @@
     },
     "hostname": {
       "type": "string",
-      "title": "SFTP host URL",
+      "title": "Host URL",
       "propertyOrder": 10
     },
     "disabled_algorithms": {
       "type": "string",
       "title": "Algorithms to disable (Optional)",
       "description": "The disabled_algorithms for example: \"{'pubkeys': ['rsa-sha2-256', 'rsa-sha2-512']}\" Find additional details at <a href='https://docs.paramiko.org/en/latest/api/transport.html?highlight=disabled_algorithms'>Paramiko documentation</a>.",
-      "propertyOrder": 60
+      "propertyOrder": 60,
+      "options": {
+        "dependencies": {
+          "protocol": "SFTP"
+        }
+      }
     },
     "banner_timeout": {
       "type": "integer",
       "default": 15,
       "title": "Banner timeout (Optional)",
       "description": "Timeout in seconds to wait for SSH banner, default value is 15. This parameter can solve issues related to establishing a connection, caused, for example, by server overload or high network latency.",
-      "propertyOrder": 70
+      "propertyOrder": 70,
+      "options": {
+        "dependencies": {
+          "protocol": "SFTP"
+        }
+      }
     },
     "test_connection": {
       "type": "button",
