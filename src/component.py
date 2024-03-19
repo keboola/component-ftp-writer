@@ -96,11 +96,27 @@ class Component(ComponentBase):
         Main execution code
         '''
         self.validate_connection_configuration()
+
+        self.init_connection()
+
+        try:
+            in_tables = self.get_input_tables_definitions()
+            in_files = self.get_input_files_definitions(only_latest_files=True)
+
+            for fl in in_tables + in_files:
+                self._upload_file(fl)
+        except Exception:
+            raise
+        finally:
+            self._close_connection()
+
+        logging.info("Done.")
+
+    def init_connection(self):
         params = self.configuration.parameters
         pkey = self.get_private_key(params)
         port = self.configuration.image_parameters.get(KEY_PORT_IMG) or params[KEY_PORT]
         host = self.configuration.image_parameters.get(KEY_HOSTNAME_IMG) or params[KEY_HOSTNAME]
-
         if params.get(KEY_PROTOCOL, False) in ["FTP", "FTPS"]:
             self.connect_to_ftp_server(port, host, params[KEY_USER], params[KEY_PASSWORD])
 
@@ -120,19 +136,6 @@ class Component(ComponentBase):
                                         pkey,
                                         disabled_algorithms,
                                         banner_timeout)
-
-        try:
-            in_tables = self.get_input_tables_definitions()
-            in_files = self.get_input_files_definitions(only_latest_files=True)
-
-            for fl in in_tables + in_files:
-                self._upload_file(fl)
-        except Exception:
-            raise
-        finally:
-            self._close_connection()
-
-        logging.info("Done.")
 
     @backoff.on_exception(backoff.expo,
                           (ConnectionError, FileNotFoundError, IOError, paramiko.SSHException),
@@ -284,6 +287,7 @@ class Component(ComponentBase):
 
     @sync_action('testConnection')
     def test_connection(self):
+        self.validate_connection_configuration()
         if self.configuration.image_parameters:
             self.validate_image_parameters([KEY_HOSTNAME_IMG, KEY_PORT_IMG])
         else:
@@ -297,32 +301,12 @@ class Component(ComponentBase):
             try:
                 self.connect_to_ftp_server(port, host, params[KEY_USER], params[KEY_PASSWORD])
 
-            except Exception:
-                raise
-            finally:
-                self._close_connection()
-        else:
-
-            pkey = self.get_private_key(params[KEY_PRIVATE_KEY])
-            banner_timeout = params.get(KEY_BANNER_TIMEOUT, 15)
-
-            if params.get(KEY_DISABLED_ALGORITHMS, False):
-                disabled_algorithms = eval(params[KEY_DISABLED_ALGORITHMS])
-            else:
-                disabled_algorithms = {}
-            try:
-                self.connect_to_sftp_server(port,
-                                            host,
-                                            params[KEY_USER],
-                                            params[KEY_PASSWORD],
-                                            pkey,
-                                            disabled_algorithms,
-                                            banner_timeout)
-
-            except Exception:
-                raise
-            finally:
-                self._close_connection()
+        try:
+            self.init_connection()
+        except Exception:
+            raise
+        finally:
+            self._close_connection()
 
 
 """
