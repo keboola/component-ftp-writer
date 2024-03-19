@@ -245,9 +245,9 @@ class Component(ComponentBase):
         logging.info(f"File Destination: {destination}")
         try:
             if params.get(KEY_PROTOCOL, False) in ["FTP", "FTPS"]:
-                self._ftp_host.upload(input_file.full_path, destination)
+                self._try_to_execute_operation(self._ftp_host.upload, input_file.full_path, destination)
             else:
-                self._try_to_execute_sftp_operation(self._sftp_client.put, input_file.full_path, destination)
+                self._try_to_execute_operation(self._sftp_client.put, input_file.full_path, destination)
         except FileNotFoundError as e:
             raise UserException(
                 f"Destination path: '{params[KEY_REMOTE_PATH]}' in FTP Server not found,"
@@ -279,7 +279,7 @@ class Component(ComponentBase):
     @backoff.on_exception(backoff.expo,
                           (ConnectionError, IOError, paramiko.SSHException),
                           max_tries=MAX_RETRIES, on_backoff=backoff_hdlr, factor=2, on_giveup=giving_up_hdlr)
-    def _try_to_execute_sftp_operation(self, operation: Callable, *args):
+    def _try_to_execute_operation(self, operation: Callable, *args):
         return operation(*args)
 
     @sync_action('testConnection')
