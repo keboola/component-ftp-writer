@@ -72,6 +72,12 @@ class MyFTP_TLS(ftplib.FTP_TLS):
         return conn, size
 
 
+class MyFTPIgnorePassiveAddresses(MyFTP_TLS):
+    def makepasv(self):
+        _, port = super().makepasv()
+        return self.host, port
+
+
 class Component(ComponentBase):
     def __init__(self):
         super().__init__()
@@ -81,9 +87,12 @@ class Component(ComponentBase):
         self._ftp_host: ftputil.FTPHost = None
         logging.getLogger("paramiko").level = logging.CRITICAL
 
-    def validate_connection_configuration(self):
+    def validate_connection_configuration(self, test_connection=False):
         try:
-            self.validate_configuration_parameters(REQUIRED_PARAMETERS)
+            if test_connection:
+                self.validate_configuration_parameters(TEST_CONNECTION_REQUIRED_PARAMETERS)
+            else:
+                self.validate_configuration_parameters(REQUIRED_PARAMETERS)
             if self.configuration.image_parameters:
                 self.validate_image_parameters([KEY_HOSTNAME_IMG, KEY_PORT_IMG])
             else:
@@ -114,7 +123,6 @@ class Component(ComponentBase):
 
     def init_connection(self):
         params = self.configuration.parameters
-        pkey = self.get_private_key(params)
         port = self.configuration.image_parameters.get(KEY_PORT_IMG) or params[KEY_PORT]
         host = self.configuration.image_parameters.get(KEY_HOSTNAME_IMG) or params[KEY_HOSTNAME]
         if params.get(KEY_PROTOCOL, False) in ["FTP", "FTPS"]:
@@ -288,18 +296,6 @@ class Component(ComponentBase):
     @sync_action('testConnection')
     def test_connection(self):
         self.validate_connection_configuration()
-        if self.configuration.image_parameters:
-            self.validate_image_parameters([KEY_HOSTNAME_IMG, KEY_PORT_IMG])
-        else:
-            self.validate_configuration_parameters([KEY_PORT, KEY_HOSTNAME])
-        params = self.configuration.parameters
-        pkey = self.get_private_key(params)
-        port = self.configuration.image_parameters.get(KEY_PORT_IMG) or params[KEY_PORT]
-        host = self.configuration.image_parameters.get(KEY_HOSTNAME_IMG) or params[KEY_HOSTNAME]
-
-        if params.get(KEY_PROTOCOL, False) in ["FTP", "FTPS"]:
-            try:
-                self.connect_to_ftp_server(port, host, params[KEY_USER], params[KEY_PASSWORD])
 
         try:
             self.init_connection()
