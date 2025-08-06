@@ -1,0 +1,12 @@
+{
+  "parameters": {
+    "protocol": "sftp",
+    "user": "user",
+    "#pass": "pass",
+    "append_date": 0,
+    "debug": true,
+    "hostname": "sftp",
+    "port": 22,
+    "path": "/"
+  }
+}

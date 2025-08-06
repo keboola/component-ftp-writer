@@ -1,4 +1,3 @@
-version: "2"
 services:
   # for development purposes
   dev:
@@ -11,6 +10,11 @@ services:
   test:
     # Use to run flake8 and unittests checks
     build: .
+    depends_on:
+      ftp:
+        condition: service_started
+      sftp:
+        condition: service_started
     volumes:
       - ./:/code
       - ./data:/data
@@ -19,3 +23,22 @@ services:
     command:
       - /bin/sh
       - /code/scripts/build_n_test.sh
+
+  ftp:
+    image: fauria/vsftpd
+    ports:
+      - "21:21"
+      - "21100-21110:21100-21110"
+    environment:
+      - FTP_USER=user
+      - FTP_PASS=pass
+    volumes:
+      - ./tests/expected_server_data/ftp:/home/vsftpd/user
+
+  sftp:
+    image: atmoz/sftp
+    ports:
+      - "2222:22"
+    command: user:pass
+    volumes:
+      - ./tests/expected_server_data/sftp:/home/user
