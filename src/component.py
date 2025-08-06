@@ -138,7 +138,8 @@ class Component(ComponentBase):
             logging.warning(f"Failed to close connection: {e}")
 
     def get_private_key(self, params):
-        keystring = params.get(KEY_PRIVATE_KEY) or params.get(SSH_ELEMENT, {}).get(SSH_KEYS, {}).get(KEY_PRIVATE)
+        ssh_element = params.get(SSH_ELEMENT) or {}  # handling the case when empty dict is passed as list
+        keystring = params.get(KEY_PRIVATE_KEY) or ssh_element.get(SSH_KEYS, {}).get(KEY_PRIVATE)
         pkey = None
         if keystring:
             keyfile = StringIO(keystring.rstrip())
