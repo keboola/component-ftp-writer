@@ -1,4 +1,5 @@
 FROM python:3.13-slim
+RUN apt-get update && apt-get install -y netcat-openbsd
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 WORKDIR /code/
 COPY pyproject.toml .

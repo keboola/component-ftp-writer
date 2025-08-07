@@ -21,8 +21,16 @@ services:
     environment:
       - KBC_DATADIR=./data
     command:
-      - /bin/sh
-      - /code/scripts/build_n_test.sh
+    - /bin/sh
+    - -c
+    - |
+      echo "Waiting for FTP"
+      for i in $(seq 1 30); do nc -z ftp 21 && break || sleep 1; done
+  
+      echo "Waiting for SFTP"
+      for i in $(seq 1 30); do nc -z sftp 22 && break || sleep 1; done
+  
+      /bin/sh /code/scripts/build_n_test.sh
 
   ftp:
     image: fauria/vsftpd
@@ -39,6 +47,6 @@ services:
     image: atmoz/sftp
     ports:
       - "2222:22"
-    command: user:pass
     volumes:
-      - ./tests/expected_server_data/sftp:/home/user
+      - ./tests/expected_server_data/sftp/:/home/user/upload
+    command: user:pass:${HOST_UID}:${HOST_GID}:upload

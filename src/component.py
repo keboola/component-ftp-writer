@@ -14,7 +14,7 @@ from keboola.component.exceptions import UserException
 
 from configuration import Configuration, Protocol
 
-MAX_RETRIES = 6
+MAX_RETRIES = 2
 
 # img parameter names
 KEY_HOSTNAME_IMG = "sftp_host"

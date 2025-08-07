@@ -7,6 +7,6 @@
     "debug": true,
     "hostname": "sftp",
     "port": 22,
-    "path": "/"
+    "path": "/upload"
   }
 }
