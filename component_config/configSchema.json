@@ -2,6 +2,7 @@
   "type": "object",
   "title": "SFTP / FTP writer",
   "required": [
+    "protocol",
     "hostname",
     "port",
     "user",
@@ -40,7 +41,10 @@
       "type": "object",
       "format": "ssh-editor",
       "options": {
-        "only_keys": true
+        "only_keys": true,
+        "dependencies": {
+          "protocol": "SFTP"
+        }
       }
     },
     "hostname": {
