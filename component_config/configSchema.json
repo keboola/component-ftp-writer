@@ -24,6 +24,9 @@
       "type": "integer",
       "default": 22,
       "title": "Host port",
+      "options": {
+            "tooltip": "The default port number is 22 for SFTP, 21 for FTP, and 990 for FTPS."
+          },
       "propertyOrder": 20
     },
     "user": {

@@ -1,6 +1,6 @@
 [project]
-name = "component-sftp"
-version = "0.1.0"
+name = "component-ftp-writer"
+dynamic = ["version"]
 description = "SFTP, FTP and FTPS writer"
 readme = "README.md"
 requires-python = ">=3.13"

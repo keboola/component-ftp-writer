@@ -11,8 +11,8 @@ class Protocol(str, Enum):
 
 
 class SSHKeys(BaseModel):
-    public: str = Field(default=None)
-    private: str = Field(default=None, alias="#private")
+    public: str = Field(default="")
+    private: str = Field(default="", alias="#private")
 
 
 class SSH(BaseModel):
@@ -20,17 +20,17 @@ class SSH(BaseModel):
 
 
 class Configuration(BaseModel):
-    protocol: Protocol = Protocol.FTP
-    port: int = 21
+    protocol: Protocol = Protocol.SFTP
+    port: int = 22
     hostname: str
     user: str
-    password: str = Field(default=None, alias="#pass")
+    password: str = Field(default="", alias="#pass")
     ssh: SSH = Field(default_factory=SSH)
-    path: str = Field(default=None)
+    path: str = Field(default="")
     append_date: bool = False
     append_date_format: str = Field(default="%Y%m%d%H%M%S")
     banner_timeout: int = 15
-    disabled_algorithms: str = Field(default=None)
+    disabled_algorithms: str = Field(default="")
 
     debug: bool = False
 

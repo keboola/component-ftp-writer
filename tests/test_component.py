@@ -1,23 +1,24 @@
 import os
 import unittest
 from os import path
-from os.path import dirname
 import hashlib
+from pathlib import Path
 
 import mock
 from freezegun import freeze_time
 
 from src.component import Component
 
-TEST_DIR = path.join(dirname(path.realpath(__file__)), "test_data")
-TEST_DIR_TIMESTAMP = path.join(dirname(path.realpath(__file__)), "test_data_timestamp")
-TEST_DIR_FTP = path.join(dirname(path.realpath(__file__)), "e2e_configs", "ftp")
-TEST_DIR_SFTP = path.join(dirname(path.realpath(__file__)), "e2e_configs", "sftp")
-EXPECTED_SERVER_DATA = path.join(dirname(path.realpath(__file__)), "expected_server_data")
+TEST_DIR = Path(__file__).resolve().parent.joinpath("test_data")
+TEST_DIR_TIMESTAMP = Path(__file__).resolve().parent.joinpath("test_data_timestamp")
+
+TEST_DIR_FTP = Path(__file__).resolve().parent.joinpath("e2e_configs", "ftp")
+TEST_DIR_SFTP = Path(__file__).resolve().parent.joinpath("e2e_configs", "sftp")
+EXPECTED_SERVER_DATA = Path(__file__).resolve().parent.joinpath("expected_server_data")
 
 
 class TestComponent(unittest.TestCase):
-    @mock.patch.dict(os.environ, {"KBC_DATADIR": TEST_DIR})
+    @mock.patch.dict(os.environ, {"KBC_DATADIR": str(TEST_DIR)})
     def setUp(self):
         self.comp = Component()
 
@@ -37,7 +38,7 @@ class TestComponent(unittest.TestCase):
         self.assertEqual(output_destination, "/path/test_20101010000000.csv")
 
     @freeze_time("2010-10-10")
-    @mock.patch.dict(os.environ, {"KBC_DATADIR": TEST_DIR_TIMESTAMP})
+    @mock.patch.dict(os.environ, {"KBC_DATADIR": str(TEST_DIR_TIMESTAMP)})
     def test_get_output_destination_custom(self):
         comp = Component()
         input_table = comp.get_input_tables_definitions()[0]
@@ -50,7 +51,7 @@ class TestComponent(unittest.TestCase):
 
 
 class E2ETestComponent(unittest.TestCase):
-    @mock.patch.dict(os.environ, {"KBC_DATADIR": TEST_DIR_FTP})
+    @mock.patch.dict(os.environ, {"KBC_DATADIR": str(TEST_DIR_FTP)})
     def test_e2e_ftp(self):
         self.comp = Component()
         self.comp.run()
@@ -63,7 +64,7 @@ class E2ETestComponent(unittest.TestCase):
             dest_md5 = hashlib.md5(dest.read()).hexdigest()
             self.assertEqual(src_md5, dest_md5)
 
-    @mock.patch.dict(os.environ, {"KBC_DATADIR": TEST_DIR_SFTP})
+    @mock.patch.dict(os.environ, {"KBC_DATADIR": str(TEST_DIR_SFTP)})
     def test_e2e_sftp(self):
         self.comp = Component()
         self.comp.run()
