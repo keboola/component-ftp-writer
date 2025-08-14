@@ -1,0 +1,16 @@
+[project]
+name = "component-ftp-writer"
+dynamic = ["version"]
+description = "SFTP, FTP and FTPS writer"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "backoff>=2.2.1",
+    "flake8>=7.3.0",
+    "freezegun>=1.5.4",
+    "ftputil==5.1.0",
+    "keboola-component==1.4.4",
+    "mock>=5.2.0",
+    "paramiko>=2.7.2",
+    "pydantic>=2.11.7",
+]

@@ -1,6 +1,6 @@
 {
   "type": "object",
-  "title": "SFTP writer",
+  "title": "SFTP / FTP writer",
   "required": [
     "path",
     "append_date",

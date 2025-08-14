@@ -1,0 +1,12 @@
+{
+  "parameters": {
+    "protocol": "ftp",
+    "user": "user",
+    "#pass": "pass",
+    "append_date": 0,
+    "debug": true,
+    "hostname": "ftp",
+    "port": 21,
+    "path": "/"
+  }
+}

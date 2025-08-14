@@ -1,16 +1,16 @@
-FROM python:3.10
-ENV PYTHONIOENCODING utf-8
+FROM python:3.13-slim
+RUN apt-get update && apt-get install -y netcat-openbsd
 
-COPY . /code/
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+COPY pyproject.toml .
+COPY uv.lock .
 
-# install gcc to be able to build packages - e.g. required by regex, dateparser, also required for pandas
-RUN apt-get update && apt-get install -y build-essential
-
-RUN pip install flake8
-
-RUN pip install -r /code/requirements.txt
-
+ENV UV_PROJECT_ENVIRONMENT="/usr/local/"
 WORKDIR /code/
+RUN uv sync --all-groups --frozen
 
+COPY tests/ tests
+COPY flake8.cfg .
+COPY src/ src
 
 CMD ["python", "-u", "/code/src/component.py"]
