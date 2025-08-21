@@ -2,7 +2,7 @@ import ftplib
 import logging
 import os
 import socket
-from datetime import datetime
+from datetime import datetime, UTC
 from io import StringIO
 from typing import Callable
 
@@ -222,7 +222,8 @@ class Component(ComponentBase):
     def get_output_destination(self, input_file):
         timestamp_suffix = ""
         if self.params.append_date:
-            timestamp = datetime.utcnow().strftime(self.params.append_date_format)
+
+            timestamp = datetime.now(UTC).strftime(self.params.append_date_format)
             timestamp_suffix = f"_{timestamp}"
 
         file_path = self.params.path
