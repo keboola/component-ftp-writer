@@ -13,8 +13,17 @@
       "enum": [
         "SFTP",
         "FTP",
-        "FTPS"
+        "Ex-FTPS",
+        "Im-FTPS"
       ],
+      "options": {
+        "enum_titles": [
+          "SFTP",
+          "FTP",
+          "FTPS (Explicit)",
+          "FTPS (Implicit)"
+        ]
+      },
       "type": "string",
       "title": "Protocol",
       "propertyOrder": 10,
@@ -25,8 +34,8 @@
       "default": 22,
       "title": "Host port",
       "options": {
-            "tooltip": "The default port number is 22 for SFTP, 21 for FTP, and 990 for FTPS."
-          },
+        "tooltip": "The default port number is 22 for SFTP, 21 for FTP, and 990 for FTPS."
+      },
       "propertyOrder": 20
     },
     "user": {
@@ -82,6 +91,26 @@
       "type": "button",
       "format": "test-connection",
       "propertyOrder": 500
+    },
+    "passive_mode": {
+      "type": "boolean",
+      "title": "Passive mode",
+      "format": "checkbox",
+      "default": false,
+      "propertyOrder": 80,
+      "options": {
+        "dependencies": {
+          "protocol": ["FTP", "Ex-FTPS", "Im-FTPS"]
+        }
+      }
+    },
+    "debug": {
+      "type": "boolean",
+      "title": "Debug mode",
+      "format": "checkbox",
+      "default": false,
+      "description": "If enabled, the component will produce detailed logs",
+      "propertyOrder": 80
     }
   }
 }

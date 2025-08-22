@@ -6,6 +6,7 @@ from datetime import datetime, UTC
 from io import StringIO
 from typing import Callable
 
+import ssl
 import backoff
 import ftputil
 import paramiko
@@ -29,7 +30,7 @@ def giving_up_hdlr(details):
     raise UserException("Too many retries, giving up calling {target}".format(**details))
 
 
-class MyFTP_TLS(ftplib.FTP_TLS):
+class ExplicitFTPS(ftplib.FTP_TLS):
     """Explicit FTPS, with shared TLS session
     workaround from https://stackoverflow.com/questions/14659154/ftps-with-python-ftplib-session-reuse-required"""
 
@@ -40,6 +41,27 @@ class MyFTP_TLS(ftplib.FTP_TLS):
                 conn, server_hostname=self.host, session=self.sock.session
             )  # this is the fix
         return conn, size
+
+
+class ImplicitFTPS(ftplib.FTP_TLS):
+    """FTP_TLS subclass that automatically wraps sockets in SSL to support implicit FTPS.
+    workaround from https://stackoverflow.com/a/36049814"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._sock = None
+
+    @property
+    def sock(self):
+        """Return the socket."""
+        return self._sock
+
+    @sock.setter
+    def sock(self, value):
+        """When modifying the socket, ensure that it is ssl wrapped."""
+        if value is not None and not isinstance(value, ssl.SSLSocket):
+            value = self.context.wrap_socket(value)
+        self._sock = value
 
 
 class Component(ComponentBase):
@@ -68,7 +90,7 @@ class Component(ComponentBase):
     def init_connection(self):
         port = self.configuration.image_parameters.get(KEY_PORT_IMG) or self.params.port
         host = self.configuration.image_parameters.get(KEY_HOSTNAME_IMG) or self.params.hostname
-        if self.params.protocol in [Protocol.FTP, Protocol.FTPS]:
+        if self.params.protocol in [Protocol.FTP, Protocol.ExplicitFTPS, Protocol.ImplicitFTPS]:
             self.connect_to_ftp_server(port, host, self.params.user, self.params.password)
 
         else:
@@ -119,13 +141,15 @@ class Component(ComponentBase):
         try:
             if self.params.protocol == Protocol.FTP:
                 base = ftplib.FTP
+            elif self.params.protocol == Protocol.ExplicitFTPS:
+                base = ExplicitFTPS
             else:
-                base = MyFTP_TLS
+                base = ImplicitFTPS
 
             session_factory = ftputil.session.session_factory(
                 base_class=base,
                 port=port,
-                use_passive_mode=None,
+                use_passive_mode=self.params.passive_mode,
                 encrypt_data_channel=True,
                 encoding=None,
                 debug_level=None,
@@ -201,7 +225,7 @@ class Component(ComponentBase):
         logging.info(f"File Source: {input_file.full_path}")
         logging.info(f"File Destination: {destination}")
         try:
-            if self.params.protocol in [Protocol.FTP, Protocol.FTPS]:
+            if self.params.protocol in [Protocol.FTP, Protocol.ExplicitFTPS, Protocol.ImplicitFTPS]:
                 self._try_to_execute_operation(self._ftp_client.upload, input_file.full_path, destination)
             else:
                 self._try_to_execute_operation(self._sftp_client.put, input_file.full_path, destination)
@@ -222,7 +246,6 @@ class Component(ComponentBase):
     def get_output_destination(self, input_file):
         timestamp_suffix = ""
         if self.params.append_date:
-
             timestamp = datetime.now(UTC).strftime(self.params.append_date_format)
             timestamp_suffix = f"_{timestamp}"
 
