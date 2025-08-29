@@ -6,7 +6,8 @@ from pydantic import BaseModel, Field, ValidationError, field_validator
 
 class Protocol(str, Enum):
     FTP = "ftp"
-    FTPS = "ftps"
+    EX_FTPS = "ex-ftps"
+    IM_FTPS = "im-ftps"
     SFTP = "sftp"
 
 
@@ -31,6 +32,7 @@ class Configuration(BaseModel):
     append_date_format: str = Field(default="%Y%m%d%H%M%S")
     banner_timeout: int = 15
     disabled_algorithms: str = Field(default="")
+    passive_mode: bool = False
 
     debug: bool = False
 
