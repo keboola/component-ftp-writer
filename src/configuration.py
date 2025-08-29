@@ -6,8 +6,8 @@ from pydantic import BaseModel, Field, ValidationError, field_validator
 
 class Protocol(str, Enum):
     FTP = "ftp"
-    ExplicitFTPS = "ex-ftps"
-    ImplicitFTPS = "im-ftps"
+    EX_FTPS = "ex-ftps"
+    IM_FTPS = "im-ftps"
     SFTP = "sftp"
 
 

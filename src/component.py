@@ -90,7 +90,7 @@ class Component(ComponentBase):
     def init_connection(self):
         port = self.configuration.image_parameters.get(KEY_PORT_IMG) or self.params.port
         host = self.configuration.image_parameters.get(KEY_HOSTNAME_IMG) or self.params.hostname
-        if self.params.protocol in [Protocol.FTP, Protocol.ExplicitFTPS, Protocol.ImplicitFTPS]:
+        if self.params.protocol in [Protocol.FTP, Protocol.EX_FTPS, Protocol.IM_FTPS]:
             self.connect_to_ftp_server(port, host, self.params.user, self.params.password)
 
         else:
@@ -141,7 +141,7 @@ class Component(ComponentBase):
         try:
             if self.params.protocol == Protocol.FTP:
                 base = ftplib.FTP
-            elif self.params.protocol == Protocol.ExplicitFTPS:
+            elif self.params.protocol == Protocol.EX_FTPS:
                 base = ExplicitFTPS
             else:
                 base = ImplicitFTPS
@@ -225,7 +225,7 @@ class Component(ComponentBase):
         logging.info(f"File Source: {input_file.full_path}")
         logging.info(f"File Destination: {destination}")
         try:
-            if self.params.protocol in [Protocol.FTP, Protocol.ExplicitFTPS, Protocol.ImplicitFTPS]:
+            if self.params.protocol in [Protocol.FTP, Protocol.EX_FTPS, Protocol.IM_FTPS]:
                 self._try_to_execute_operation(self._ftp_client.upload, input_file.full_path, destination)
             else:
                 self._try_to_execute_operation(self._sftp_client.put, input_file.full_path, destination)
