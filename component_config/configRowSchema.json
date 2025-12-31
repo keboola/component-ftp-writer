@@ -11,6 +11,7 @@
       "type": "string",
       "title": "Remote destination path",
       "description": "e.g. /home/user/sftp/",
+      "default": "/",
       "propertyOrder": 60
     },
     "append_date": {

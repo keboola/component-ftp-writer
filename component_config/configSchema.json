@@ -57,7 +57,8 @@
         "dependencies": {
           "protocol": "SFTP"
         }
-      }
+      },
+      "propertyOrder": 45
     },
     "#passphrase": {
       "type": "string",
