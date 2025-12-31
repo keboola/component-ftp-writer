@@ -196,14 +196,6 @@ class Component(ComponentBase):
         except paramiko.SSHException as e:
             logging.warning(f"RSS Private key invalid: {e}")
             failed = True
-        # DSS
-        if failed:
-            try:
-                pkey = paramiko.DSSKey.from_private_key(keyfile)
-                failed = False
-            except (paramiko.SSHException, IndexError):
-                logging.warning("DSS Private key invalid, trying ECDSAKey.")
-                failed = True
         # ECDSAKey
         if failed:
             try:
