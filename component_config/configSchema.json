@@ -59,6 +59,13 @@
         }
       }
     },
+    "#passphrase": {
+      "type": "string",
+      "title": "Passphrase (Optional)",
+      "description": "Passphrase for key",
+      "format": "password",
+      "propertyOrder": 50
+    },
     "hostname": {
       "type": "string",
       "title": "Host URL",
@@ -100,7 +107,11 @@
       "propertyOrder": 80,
       "options": {
         "dependencies": {
-          "protocol": ["FTP", "Ex-FTPS", "Im-FTPS"]
+          "protocol": [
+            "FTP",
+            "Ex-FTPS",
+            "Im-FTPS"
+          ]
         }
       }
     },
@@ -110,7 +121,7 @@
       "format": "checkbox",
       "default": false,
       "description": "If enabled, the component will produce detailed logs",
-      "propertyOrder": 80
+      "propertyOrder": 90
     }
   }
 }
