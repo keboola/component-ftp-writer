@@ -178,22 +178,23 @@ class Component(ComponentBase):
         pkey = None
         if keystring:
             keyfile = StringIO(keystring.rstrip())
+            passphrase = self.params.passphrase
             try:
-                pkey = self._parse_private_key(keyfile)
+                pkey = self._parse_private_key(keyfile, passphrase)
             except (paramiko.SSHException, IndexError) as e:
                 logging.exception("Private Key is invalid")
                 raise UserException("Failed to parse private Key") from e
         return pkey
 
     @staticmethod
-    def _parse_private_key(keyfile):
+    def _parse_private_key(keyfile, passphrase=None):
         # try all versions of encryption keys
         pkey = None
         failed = False
         try:
-            pkey = paramiko.RSAKey.from_private_key(keyfile)
-        except paramiko.SSHException:
-            logging.warning("RSS Private key invalid, trying DSS.")
+            pkey = paramiko.RSAKey.from_private_key(keyfile, password=passphrase)
+        except paramiko.SSHException as e:
+            logging.warning(f"RSS Private key invalid: {e}")
             failed = True
         # DSS
         if failed:
@@ -206,7 +207,7 @@ class Component(ComponentBase):
         # ECDSAKey
         if failed:
             try:
-                pkey = paramiko.ECDSAKey.from_private_key(keyfile)
+                pkey = paramiko.ECDSAKey.from_private_key(keyfile, password=passphrase)
                 failed = False
             except (paramiko.SSHException, IndexError):
                 logging.warning("ECDSAKey Private key invalid, trying Ed25519Key.")
@@ -214,7 +215,7 @@ class Component(ComponentBase):
         # Ed25519Key
         if failed:
             try:
-                pkey = paramiko.Ed25519Key.from_private_key(keyfile)
+                pkey = paramiko.Ed25519Key.from_private_key(keyfile, password=passphrase)
             except (paramiko.SSHException, IndexError) as e:
                 logging.warning("Ed25519Key Private key invalid.")
                 raise e

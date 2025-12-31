@@ -27,6 +27,7 @@ class Configuration(BaseModel):
     user: str
     password: str = Field(default="", alias="#pass")
     ssh: SSH = Field(default_factory=SSH)
+    passphrase: str = Field(default=None, alias="#passphrase")
     path: str = Field(default="")
     append_date: bool = False
     append_date_format: str = Field(default="%Y%m%d%H%M%S")
